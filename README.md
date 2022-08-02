@@ -16,7 +16,7 @@ import FeatureProbe
 
 let url = FpUrlBuilder(remoteUrl: "remote_url").build();
 let user = FpUser(key: "key123")
-user.setAttr(key: "city", value: "1")
+user.with(key: "city", value: "1")
 let config = FpConfig(
     remoteUrl: url!,
     clientSdkKey: "client-9d885a68ca2955dfb3a7c95435c0c4faad70b50d",
@@ -44,6 +44,7 @@ NSLog(@"value is %@", value);
 ```
 
 ## Build
+
 build from repo: `git@github.com:FeatureProbe/client-sdk-mobile.git`
 
 1. install uniffi codegen tool
@@ -68,8 +69,26 @@ git commit -m 'xxx'
 git push origin master
 ```
 
+## Unit Testing
+
+```swift
+let fp2 = FeatureProbe.newForTest(toggles: "{ \"toggle_1\": true }")
+let is_true = fp2.boolValue(key: "toggle_1", defaultValue: false)
+assert(is_true == true);
+```
+
+```objective-c
+#import "FeatureProbe-Swift.h"
+
+NSString *s = @"{ \"ab_test\": \"green\"}";
+FeatureProbe *fp = [[FeatureProbe alloc] initWithTestJson: s];
+NSString *value = [fp stringValueWithKey:@"ab_test" defaultValue:@"red"];
+NSLog(@"value is %@", value);
+```
+
 
 ## Contributing
+
 We are working on continue evolving FeatureProbe core, making it flexible and easier to use.
 Development of FeatureProbe happens in the open on GitHub, and we are grateful to the
 community for contributing bugfixes and improvements.

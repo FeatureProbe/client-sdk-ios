@@ -20,6 +20,10 @@ public final class OcFeatureProbe: NSObject {
         let user = user.user
         fp = FeatureProbe(config: config, user: user)
     }
+
+    @objc public init(testJson: String) {
+        fp = FeatureProbe.newForTest(toggles: testJson)
+    }
     
     @objc public func boolValue(key: String, defaultValue: Bool)  -> Bool {
         fp.boolValue(key: key, defaultValue: defaultValue)
@@ -68,8 +72,8 @@ public final class OFpUser: NSObject {
         user = u
     }
     
-    @objc public func setAttr(key: String, value: String)  {
-        user.setAttr(key: key, value: value)
+    @objc public func with(key: String, value: String)  {
+        user.with(key: key, value: value)
     }
 }
 
