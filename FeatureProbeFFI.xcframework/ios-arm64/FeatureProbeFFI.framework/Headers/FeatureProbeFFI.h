@@ -46,99 +46,107 @@ typedef struct RustCallStatus {
 // ⚠️ increment the version suffix in all instances of UNIFFI_SHARED_HEADER_V4 in this file.           ⚠️
 #endif // def UNIFFI_SHARED_H
 
-void ffi_featureprobe_e5_FeatureProbe_object_free(
+void ffi_featureprobe_dbd9_FeatureProbe_object_free(
       void*_Nonnull ptr,
     RustCallStatus *_Nonnull out_status
     );
-void*_Nonnull featureprobe_e5_FeatureProbe_new(
+void*_Nonnull featureprobe_dbd9_FeatureProbe_new(
       void*_Nonnull config,void*_Nonnull user,
     RustCallStatus *_Nonnull out_status
     );
-void*_Nonnull featureprobe_e5_FeatureProbe_new_for_test(
+void*_Nonnull featureprobe_dbd9_FeatureProbe_new_for_test(
       RustBuffer toggles,
     RustCallStatus *_Nonnull out_status
     );
-int8_t featureprobe_e5_FeatureProbe_bool_value(
-      void*_Nonnull ptr,RustBuffer key,int8_t default_value,
-    RustCallStatus *_Nonnull out_status
-    );
-RustBuffer featureprobe_e5_FeatureProbe_bool_detail(
-      void*_Nonnull ptr,RustBuffer key,int8_t default_value,
-    RustCallStatus *_Nonnull out_status
-    );
-double featureprobe_e5_FeatureProbe_number_value(
-      void*_Nonnull ptr,RustBuffer key,double default_value,
-    RustCallStatus *_Nonnull out_status
-    );
-RustBuffer featureprobe_e5_FeatureProbe_number_detail(
-      void*_Nonnull ptr,RustBuffer key,double default_value,
-    RustCallStatus *_Nonnull out_status
-    );
-RustBuffer featureprobe_e5_FeatureProbe_string_value(
-      void*_Nonnull ptr,RustBuffer key,RustBuffer default_value,
-    RustCallStatus *_Nonnull out_status
-    );
-RustBuffer featureprobe_e5_FeatureProbe_string_detail(
-      void*_Nonnull ptr,RustBuffer key,RustBuffer default_value,
-    RustCallStatus *_Nonnull out_status
-    );
-RustBuffer featureprobe_e5_FeatureProbe_json_value(
-      void*_Nonnull ptr,RustBuffer key,RustBuffer default_value,
-    RustCallStatus *_Nonnull out_status
-    );
-RustBuffer featureprobe_e5_FeatureProbe_json_detail(
-      void*_Nonnull ptr,RustBuffer key,RustBuffer default_value,
-    RustCallStatus *_Nonnull out_status
-    );
-void ffi_featureprobe_e5_FPUser_object_free(
+void featureprobe_dbd9_FeatureProbe_close(
       void*_Nonnull ptr,
     RustCallStatus *_Nonnull out_status
     );
-void*_Nonnull featureprobe_e5_FPUser_new(
-      RustBuffer key,
+int8_t featureprobe_dbd9_FeatureProbe_bool_value(
+      void*_Nonnull ptr,RustBuffer key,int8_t default_value,
     RustCallStatus *_Nonnull out_status
     );
-void featureprobe_e5_FPUser_with(
+RustBuffer featureprobe_dbd9_FeatureProbe_bool_detail(
+      void*_Nonnull ptr,RustBuffer key,int8_t default_value,
+    RustCallStatus *_Nonnull out_status
+    );
+double featureprobe_dbd9_FeatureProbe_number_value(
+      void*_Nonnull ptr,RustBuffer key,double default_value,
+    RustCallStatus *_Nonnull out_status
+    );
+RustBuffer featureprobe_dbd9_FeatureProbe_number_detail(
+      void*_Nonnull ptr,RustBuffer key,double default_value,
+    RustCallStatus *_Nonnull out_status
+    );
+RustBuffer featureprobe_dbd9_FeatureProbe_string_value(
+      void*_Nonnull ptr,RustBuffer key,RustBuffer default_value,
+    RustCallStatus *_Nonnull out_status
+    );
+RustBuffer featureprobe_dbd9_FeatureProbe_string_detail(
+      void*_Nonnull ptr,RustBuffer key,RustBuffer default_value,
+    RustCallStatus *_Nonnull out_status
+    );
+RustBuffer featureprobe_dbd9_FeatureProbe_json_value(
+      void*_Nonnull ptr,RustBuffer key,RustBuffer default_value,
+    RustCallStatus *_Nonnull out_status
+    );
+RustBuffer featureprobe_dbd9_FeatureProbe_json_detail(
+      void*_Nonnull ptr,RustBuffer key,RustBuffer default_value,
+    RustCallStatus *_Nonnull out_status
+    );
+void ffi_featureprobe_dbd9_FPUser_object_free(
+      void*_Nonnull ptr,
+    RustCallStatus *_Nonnull out_status
+    );
+void*_Nonnull featureprobe_dbd9_FPUser_new(
+      
+    RustCallStatus *_Nonnull out_status
+    );
+void featureprobe_dbd9_FPUser_stable_rollout(
+      void*_Nonnull ptr,RustBuffer key,
+    RustCallStatus *_Nonnull out_status
+    );
+void featureprobe_dbd9_FPUser_with(
       void*_Nonnull ptr,RustBuffer key,RustBuffer value,
     RustCallStatus *_Nonnull out_status
     );
-void ffi_featureprobe_e5_FPUrl_object_free(
+void ffi_featureprobe_dbd9_FPUrl_object_free(
       void*_Nonnull ptr,
     RustCallStatus *_Nonnull out_status
     );
-void ffi_featureprobe_e5_FPUrlBuilder_object_free(
+void ffi_featureprobe_dbd9_FPUrlBuilder_object_free(
       void*_Nonnull ptr,
     RustCallStatus *_Nonnull out_status
     );
-void*_Nonnull featureprobe_e5_FPUrlBuilder_new(
+void*_Nonnull featureprobe_dbd9_FPUrlBuilder_new(
       RustBuffer remote_url,
     RustCallStatus *_Nonnull out_status
     );
-RustBuffer featureprobe_e5_FPUrlBuilder_build(
+RustBuffer featureprobe_dbd9_FPUrlBuilder_build(
       void*_Nonnull ptr,
     RustCallStatus *_Nonnull out_status
     );
-void ffi_featureprobe_e5_FPConfig_object_free(
+void ffi_featureprobe_dbd9_FPConfig_object_free(
       void*_Nonnull ptr,
     RustCallStatus *_Nonnull out_status
     );
-void*_Nonnull featureprobe_e5_FPConfig_new(
+void*_Nonnull featureprobe_dbd9_FPConfig_new(
       void*_Nonnull remote_url,RustBuffer client_sdk_key,uint8_t refresh_interval,int8_t wait_first_resp,
     RustCallStatus *_Nonnull out_status
     );
-RustBuffer ffi_featureprobe_e5_rustbuffer_alloc(
+RustBuffer ffi_featureprobe_dbd9_rustbuffer_alloc(
       int32_t size,
     RustCallStatus *_Nonnull out_status
     );
-RustBuffer ffi_featureprobe_e5_rustbuffer_from_bytes(
+RustBuffer ffi_featureprobe_dbd9_rustbuffer_from_bytes(
       ForeignBytes bytes,
     RustCallStatus *_Nonnull out_status
     );
-void ffi_featureprobe_e5_rustbuffer_free(
+void ffi_featureprobe_dbd9_rustbuffer_free(
       RustBuffer buf,
     RustCallStatus *_Nonnull out_status
     );
-RustBuffer ffi_featureprobe_e5_rustbuffer_reserve(
+RustBuffer ffi_featureprobe_dbd9_rustbuffer_reserve(
       RustBuffer buf,int32_t additional,
     RustCallStatus *_Nonnull out_status
     );

@@ -19,13 +19,13 @@ fileprivate extension RustBuffer {
     }
 
     static func from(_ ptr: UnsafeBufferPointer<UInt8>) -> RustBuffer {
-        try! rustCall { ffi_featureprobe_e5_rustbuffer_from_bytes(ForeignBytes(bufferPointer: ptr), $0) }
+        try! rustCall { ffi_featureprobe_dbd9_rustbuffer_from_bytes(ForeignBytes(bufferPointer: ptr), $0) }
     }
 
     // Frees the buffer in place.
     // The buffer must not be used after this is called.
     func deallocate() {
-        try! rustCall { ffi_featureprobe_e5_rustbuffer_free(self, $0) }
+        try! rustCall { ffi_featureprobe_dbd9_rustbuffer_free(self, $0) }
     }
 }
 
@@ -282,6 +282,7 @@ private func makeRustCall<T>(_ callback: (UnsafeMutablePointer<RustCallStatus>) 
 
 
 public protocol FeatureProbeProtocol {
+    func close() 
     func boolValue(key: String, defaultValue: Bool)  -> Bool
     func boolDetail(key: String, defaultValue: Bool)  -> FpBoolDetail
     func numberValue(key: String, defaultValue: Double)  -> Double
@@ -307,14 +308,14 @@ public class FeatureProbe: FeatureProbeProtocol {
     
     rustCall() {
     
-    featureprobe_e5_FeatureProbe_new(
+    featureprobe_dbd9_FeatureProbe_new(
         FfiConverterTypeFpConfig.lower(config), 
         FfiConverterTypeFpUser.lower(user), $0)
 })
     }
 
     deinit {
-        try! rustCall { ffi_featureprobe_e5_FeatureProbe_object_free(pointer, $0) }
+        try! rustCall { ffi_featureprobe_dbd9_FeatureProbe_object_free(pointer, $0) }
     }
 
     
@@ -323,19 +324,27 @@ public class FeatureProbe: FeatureProbeProtocol {
     
     rustCall() {
     
-    featureprobe_e5_FeatureProbe_new_for_test(
+    featureprobe_dbd9_FeatureProbe_new_for_test(
         FfiConverterString.lower(toggles), $0)
 })
     }
     
 
     
+    public func close()  {
+        try!
+    rustCall() {
+    
+    featureprobe_dbd9_FeatureProbe_close(self.pointer, $0
+    )
+}
+    }
     public func boolValue(key: String, defaultValue: Bool)  -> Bool {
         return try! FfiConverterBool.lift(
             try!
     rustCall() {
     
-    featureprobe_e5_FeatureProbe_bool_value(self.pointer, 
+    featureprobe_dbd9_FeatureProbe_bool_value(self.pointer, 
         FfiConverterString.lower(key), 
         FfiConverterBool.lower(defaultValue), $0
     )
@@ -347,7 +356,7 @@ public class FeatureProbe: FeatureProbeProtocol {
             try!
     rustCall() {
     
-    featureprobe_e5_FeatureProbe_bool_detail(self.pointer, 
+    featureprobe_dbd9_FeatureProbe_bool_detail(self.pointer, 
         FfiConverterString.lower(key), 
         FfiConverterBool.lower(defaultValue), $0
     )
@@ -359,7 +368,7 @@ public class FeatureProbe: FeatureProbeProtocol {
             try!
     rustCall() {
     
-    featureprobe_e5_FeatureProbe_number_value(self.pointer, 
+    featureprobe_dbd9_FeatureProbe_number_value(self.pointer, 
         FfiConverterString.lower(key), 
         FfiConverterDouble.lower(defaultValue), $0
     )
@@ -371,7 +380,7 @@ public class FeatureProbe: FeatureProbeProtocol {
             try!
     rustCall() {
     
-    featureprobe_e5_FeatureProbe_number_detail(self.pointer, 
+    featureprobe_dbd9_FeatureProbe_number_detail(self.pointer, 
         FfiConverterString.lower(key), 
         FfiConverterDouble.lower(defaultValue), $0
     )
@@ -383,7 +392,7 @@ public class FeatureProbe: FeatureProbeProtocol {
             try!
     rustCall() {
     
-    featureprobe_e5_FeatureProbe_string_value(self.pointer, 
+    featureprobe_dbd9_FeatureProbe_string_value(self.pointer, 
         FfiConverterString.lower(key), 
         FfiConverterString.lower(defaultValue), $0
     )
@@ -395,7 +404,7 @@ public class FeatureProbe: FeatureProbeProtocol {
             try!
     rustCall() {
     
-    featureprobe_e5_FeatureProbe_string_detail(self.pointer, 
+    featureprobe_dbd9_FeatureProbe_string_detail(self.pointer, 
         FfiConverterString.lower(key), 
         FfiConverterString.lower(defaultValue), $0
     )
@@ -407,7 +416,7 @@ public class FeatureProbe: FeatureProbeProtocol {
             try!
     rustCall() {
     
-    featureprobe_e5_FeatureProbe_json_value(self.pointer, 
+    featureprobe_dbd9_FeatureProbe_json_value(self.pointer, 
         FfiConverterString.lower(key), 
         FfiConverterString.lower(defaultValue), $0
     )
@@ -419,7 +428,7 @@ public class FeatureProbe: FeatureProbeProtocol {
             try!
     rustCall() {
     
-    featureprobe_e5_FeatureProbe_json_detail(self.pointer, 
+    featureprobe_dbd9_FeatureProbe_json_detail(self.pointer, 
         FfiConverterString.lower(key), 
         FfiConverterString.lower(defaultValue), $0
     )
@@ -461,6 +470,7 @@ fileprivate struct FfiConverterTypeFeatureProbe: FfiConverter {
 }
 
 public protocol FPUserProtocol {
+    func stableRollout(key: String) 
     func with(key: String, value: String) 
     
 }
@@ -474,28 +484,36 @@ public class FpUser: FPUserProtocol {
     required init(unsafeFromRawPointer pointer: UnsafeMutableRawPointer) {
         self.pointer = pointer
     }
-    public convenience init(key: String)  {
+    public convenience init()  {
         self.init(unsafeFromRawPointer: try!
     
     rustCall() {
     
-    featureprobe_e5_FPUser_new(
-        FfiConverterString.lower(key), $0)
+    featureprobe_dbd9_FPUser_new($0)
 })
     }
 
     deinit {
-        try! rustCall { ffi_featureprobe_e5_FPUser_object_free(pointer, $0) }
+        try! rustCall { ffi_featureprobe_dbd9_FPUser_object_free(pointer, $0) }
     }
 
     
 
     
+    public func stableRollout(key: String)  {
+        try!
+    rustCall() {
+    
+    featureprobe_dbd9_FPUser_stable_rollout(self.pointer, 
+        FfiConverterString.lower(key), $0
+    )
+}
+    }
     public func with(key: String, value: String)  {
         try!
     rustCall() {
     
-    featureprobe_e5_FPUser_with(self.pointer, 
+    featureprobe_dbd9_FPUser_with(self.pointer, 
         FfiConverterString.lower(key), 
         FfiConverterString.lower(value), $0
     )
@@ -550,7 +568,7 @@ public class FpUrl: FPUrlProtocol {
     }
 
     deinit {
-        try! rustCall { ffi_featureprobe_e5_FPUrl_object_free(pointer, $0) }
+        try! rustCall { ffi_featureprobe_dbd9_FPUrl_object_free(pointer, $0) }
     }
 
     
@@ -609,13 +627,13 @@ public class FpUrlBuilder: FPUrlBuilderProtocol {
     
     rustCall() {
     
-    featureprobe_e5_FPUrlBuilder_new(
+    featureprobe_dbd9_FPUrlBuilder_new(
         FfiConverterString.lower(remoteUrl), $0)
 })
     }
 
     deinit {
-        try! rustCall { ffi_featureprobe_e5_FPUrlBuilder_object_free(pointer, $0) }
+        try! rustCall { ffi_featureprobe_dbd9_FPUrlBuilder_object_free(pointer, $0) }
     }
 
     
@@ -626,7 +644,7 @@ public class FpUrlBuilder: FPUrlBuilderProtocol {
             try!
     rustCall() {
     
-    featureprobe_e5_FPUrlBuilder_build(self.pointer, $0
+    featureprobe_dbd9_FPUrlBuilder_build(self.pointer, $0
     )
 }
         )
@@ -683,7 +701,7 @@ public class FpConfig: FPConfigProtocol {
     
     rustCall() {
     
-    featureprobe_e5_FPConfig_new(
+    featureprobe_dbd9_FPConfig_new(
         FfiConverterTypeFpUrl.lower(remoteUrl), 
         FfiConverterString.lower(clientSdkKey), 
         FfiConverterUInt8.lower(refreshInterval), 
@@ -692,7 +710,7 @@ public class FpConfig: FPConfigProtocol {
     }
 
     deinit {
-        try! rustCall { ffi_featureprobe_e5_FPConfig_object_free(pointer, $0) }
+        try! rustCall { ffi_featureprobe_dbd9_FPConfig_object_free(pointer, $0) }
     }
 
     
