@@ -4,9 +4,9 @@ import Foundation
 public final class OFpConfig: NSObject {
     var config: FpConfig
     
-    @objc public init(remoteUrl: OFpUrl, clientSdkKey: String, refreshInterval: UInt8, waitFirstResp: Bool)  {
+    @objc public init(remoteUrl: OFpUrl, clientSdkKey: String, refreshInterval: UInt32, startWait: UInt32)  {
         let remoteUrl = remoteUrl._url
-        config = FpConfig(remoteUrl: remoteUrl, clientSdkKey: clientSdkKey, refreshInterval: refreshInterval, waitFirstResp: waitFirstResp)
+        config = FpConfig(remoteUrl: remoteUrl, clientSdkKey: clientSdkKey, refreshInterval: refreshInterval, startWait: startWait)
     }
     
 }
@@ -19,6 +19,10 @@ public final class OcFeatureProbe: NSObject {
         let config = config.config
         let user = user.user
         fp = FeatureProbe(config: config, user: user)
+    }
+
+    @objc public init(testJson: String) {
+        fp = FeatureProbe.newForTest(toggles: testJson)
     }
     
     @objc public func boolValue(key: String, defaultValue: Bool)  -> Bool {
@@ -56,6 +60,18 @@ public final class OcFeatureProbe: NSObject {
         let d = fp.jsonDetail(key: key, defaultValue: defaultValue)
         return OFpJsonDetail(detail: d)
     }
+
+    @objc public func track(event: String) {
+        fp.track(event: event)
+    }
+
+    @objc public func trackValue(event: String, value: Double) {
+        fp.trackValue(event: event, value: value)
+    }
+
+    @objc public func close() {
+        fp.close()
+    }
     
 }
 
@@ -63,13 +79,16 @@ public final class OcFeatureProbe: NSObject {
 public final class OFpUser: NSObject {
     var user: FpUser
     
-    @objc public init(key: String)  {
-        let u = FpUser(key: key)
-        user = u
+    @objc override public init()  {
+        user = FpUser()
     }
-    
-    @objc public func setAttr(key: String, value: String)  {
-        user.setAttr(key: key, value: value)
+
+    @objc public func with(key: String, value: String)  {
+        user.with(key: key, value: value)
+    }
+
+    @objc public func stableRollout(key: String) {
+        user.stableRollout(key: key)
     }
 }
 
