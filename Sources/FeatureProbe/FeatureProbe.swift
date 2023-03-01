@@ -19,13 +19,13 @@ fileprivate extension RustBuffer {
     }
 
     static func from(_ ptr: UnsafeBufferPointer<UInt8>) -> RustBuffer {
-        try! rustCall { ffi_featureprobe_cab4_rustbuffer_from_bytes(ForeignBytes(bufferPointer: ptr), $0) }
+        try! rustCall { ffi_featureprobe_1876_rustbuffer_from_bytes(ForeignBytes(bufferPointer: ptr), $0) }
     }
 
     // Frees the buffer in place.
     // The buffer must not be used after this is called.
     func deallocate() {
-        try! rustCall { ffi_featureprobe_cab4_rustbuffer_free(self, $0) }
+        try! rustCall { ffi_featureprobe_1876_rustbuffer_free(self, $0) }
     }
 }
 
@@ -51,7 +51,7 @@ fileprivate extension Data {
 }
 
 // A helper class to read values out of a byte buffer.
-fileprivate class Reader {
+private class Reader {
     let data: Data
     var offset: Data.Index
 
@@ -74,14 +74,14 @@ fileprivate class Reader {
             return value as! T
         }
         var value: T = 0
-        let _ = withUnsafeMutableBytes(of: &value, { data.copyBytes(to: $0, from: range)})
+        _ = withUnsafeMutableBytes(of: &value, { data.copyBytes(to: $0, from: range)})
         offset = range.upperBound
         return value.bigEndian
     }
 
     // Reads an arbitrary number of bytes, to be used to read
     // raw bytes, this is useful when lifting strings
-    func readBytes(count: Int) throws -> Array<UInt8> {
+    func readBytes(count: Int) throws -> [UInt8] {
         let range = offset..<(offset+count)
         guard data.count >= range.upperBound else {
             throw UniffiInternalError.bufferOverflow
@@ -114,7 +114,7 @@ fileprivate class Reader {
 }
 
 // A helper class to write values into a byte buffer.
-fileprivate class Writer {
+private class Writer {
     var bytes: [UInt8]
     var offset: Array<UInt8>.Index
 
@@ -149,7 +149,7 @@ fileprivate class Writer {
 
 // Protocol for types that transfer other types across the FFI. This is
 // analogous go the Rust trait of the same name.
-fileprivate protocol FfiConverter {
+private protocol FfiConverter {
     associatedtype FfiType
     associatedtype SwiftType
 
@@ -160,7 +160,7 @@ fileprivate protocol FfiConverter {
 }
 
 // Types conforming to `Primitive` pass themselves directly over the FFI.
-fileprivate protocol FfiConverterPrimitive: FfiConverter where FfiType == SwiftType { }
+private protocol FfiConverterPrimitive: FfiConverter where FfiType == SwiftType { }
 
 extension FfiConverterPrimitive {
     static func lift(_ value: FfiType) throws -> SwiftType {
@@ -174,7 +174,7 @@ extension FfiConverterPrimitive {
 
 // Types conforming to `FfiConverterRustBuffer` lift and lower into a `RustBuffer`.
 // Used for complex types where it's hard to write a custom lift/lower.
-fileprivate protocol FfiConverterRustBuffer: FfiConverter where FfiType == RustBuffer {}
+private protocol FfiConverterRustBuffer: FfiConverter where FfiType == RustBuffer {}
 
 extension FfiConverterRustBuffer {
     static func lift(_ buf: RustBuffer) throws -> SwiftType {
@@ -195,7 +195,7 @@ extension FfiConverterRustBuffer {
 }
 // An error type for FFI errors. These errors occur at the UniFFI level, not
 // the library level.
-fileprivate enum UniffiInternalError: LocalizedError {
+private enum UniffiInternalError: LocalizedError {
     case bufferOverflow
     case incompleteData
     case unexpectedOptionalTag
@@ -221,9 +221,9 @@ fileprivate enum UniffiInternalError: LocalizedError {
     }
 }
 
-fileprivate let CALL_SUCCESS: Int8 = 0
-fileprivate let CALL_ERROR: Int8 = 1
-fileprivate let CALL_PANIC: Int8 = 2
+private let CALL_SUCCESS: Int8 = 0
+private let CALL_ERROR: Int8 = 1
+private let CALL_PANIC: Int8 = 2
 
 fileprivate extension RustCallStatus {
     init() {
@@ -247,8 +247,7 @@ private func rustCall<T>(_ callback: (UnsafeMutablePointer<RustCallStatus>) -> T
 
 private func rustCallWithError<T, F: FfiConverter>
     (_ errorFfiConverter: F.Type, _ callback: (UnsafeMutablePointer<RustCallStatus>) -> T) throws -> T
-    where F.SwiftType: Error, F.FfiType == RustBuffer
-    {
+    where F.SwiftType: Error, F.FfiType == RustBuffer {
     try makeRustCall(callback, errorHandler: { return try errorFfiConverter.lift($0) })
 }
 
@@ -280,8 +279,7 @@ private func makeRustCall<T>(_ callback: (UnsafeMutablePointer<RustCallStatus>) 
 
 // Public interface members begin here.
 
-
-fileprivate struct FfiConverterUInt16: FfiConverterPrimitive {
+private struct FfiConverterUInt16: FfiConverterPrimitive {
     typealias FfiType = UInt16
     typealias SwiftType = UInt16
 
@@ -294,7 +292,7 @@ fileprivate struct FfiConverterUInt16: FfiConverterPrimitive {
     }
 }
 
-fileprivate struct FfiConverterUInt32: FfiConverterPrimitive {
+private struct FfiConverterUInt32: FfiConverterPrimitive {
     typealias FfiType = UInt32
     typealias SwiftType = UInt32
 
@@ -307,7 +305,7 @@ fileprivate struct FfiConverterUInt32: FfiConverterPrimitive {
     }
 }
 
-fileprivate struct FfiConverterUInt64: FfiConverterPrimitive {
+private struct FfiConverterUInt64: FfiConverterPrimitive {
     typealias FfiType = UInt64
     typealias SwiftType = UInt64
 
@@ -320,7 +318,7 @@ fileprivate struct FfiConverterUInt64: FfiConverterPrimitive {
     }
 }
 
-fileprivate struct FfiConverterDouble: FfiConverterPrimitive {
+private struct FfiConverterDouble: FfiConverterPrimitive {
     typealias FfiType = Double
     typealias SwiftType = Double
 
@@ -333,7 +331,7 @@ fileprivate struct FfiConverterDouble: FfiConverterPrimitive {
     }
 }
 
-fileprivate struct FfiConverterBool : FfiConverter {
+private struct FfiConverterBool: FfiConverter {
     typealias FfiType = Int8
     typealias SwiftType = Bool
 
@@ -354,7 +352,7 @@ fileprivate struct FfiConverterBool : FfiConverter {
     }
 }
 
-fileprivate struct FfiConverterString: FfiConverter {
+private struct FfiConverterString: FfiConverter {
     typealias SwiftType = String
     typealias FfiType = RustBuffer
 
@@ -392,9 +390,8 @@ fileprivate struct FfiConverterString: FfiConverter {
     }
 }
 
-
 public protocol FPConfigProtocol {
-    
+
 }
 
 public class FpConfig: FPConfigProtocol {
@@ -406,31 +403,26 @@ public class FpConfig: FPConfigProtocol {
     required init(unsafeFromRawPointer pointer: UnsafeMutableRawPointer) {
         self.pointer = pointer
     }
-    public convenience init(`remoteUrl`: FpUrl, `clientSdkKey`: String, `refreshInterval`: UInt32, `startWait`: UInt32)  {
+    public convenience init(`remoteUrl`: FpUrl, `clientSdkKey`: String, `refreshInterval`: UInt32, `startWait`: UInt32) {
         self.init(unsafeFromRawPointer: try!
-    
-    rustCall() {
-    
-    featureprobe_cab4_FPConfig_new(
-        FfiConverterTypeFpUrl.lower(`remoteUrl`), 
-        FfiConverterString.lower(`clientSdkKey`), 
-        FfiConverterUInt32.lower(`refreshInterval`), 
+
+    rustCall {
+
+    featureprobe_1876_FPConfig_new(
+        FfiConverterTypeFpUrl.lower(`remoteUrl`),
+        FfiConverterString.lower(`clientSdkKey`),
+        FfiConverterUInt32.lower(`refreshInterval`),
         FfiConverterUInt32.lower(`startWait`), $0)
 })
     }
 
     deinit {
-        try! rustCall { ffi_featureprobe_cab4_FPConfig_object_free(pointer, $0) }
+        try! rustCall { ffi_featureprobe_1876_FPConfig_object_free(pointer, $0) }
     }
 
-    
-
-    
-    
 }
 
-
-fileprivate struct FfiConverterTypeFpConfig: FfiConverter {
+private struct FfiConverterTypeFpConfig: FfiConverter {
     typealias FfiType = UnsafeMutableRawPointer
     typealias SwiftType = FpConfig
 
@@ -439,7 +431,7 @@ fileprivate struct FfiConverterTypeFpConfig: FfiConverter {
         // The Rust code won't compile if a pointer won't fit in a UInt64.
         // We have to go via `UInt` because that's the thing that's the size of a pointer.
         let ptr = UnsafeMutableRawPointer(bitPattern: UInt(truncatingIfNeeded: v))
-        if (ptr == nil) {
+        if ptr == nil {
             throw UniffiInternalError.unexpectedNullPointer
         }
         return try lift(ptr!)
@@ -460,9 +452,8 @@ fileprivate struct FfiConverterTypeFpConfig: FfiConverter {
     }
 }
 
-
 public protocol FPUrlProtocol {
-    
+
 }
 
 public class FpUrl: FPUrlProtocol {
@@ -476,17 +467,12 @@ public class FpUrl: FPUrlProtocol {
     }
 
     deinit {
-        try! rustCall { ffi_featureprobe_cab4_FPUrl_object_free(pointer, $0) }
+        try! rustCall { ffi_featureprobe_1876_FPUrl_object_free(pointer, $0) }
     }
 
-    
-
-    
-    
 }
 
-
-fileprivate struct FfiConverterTypeFpUrl: FfiConverter {
+private struct FfiConverterTypeFpUrl: FfiConverter {
     typealias FfiType = UnsafeMutableRawPointer
     typealias SwiftType = FpUrl
 
@@ -495,7 +481,7 @@ fileprivate struct FfiConverterTypeFpUrl: FfiConverter {
         // The Rust code won't compile if a pointer won't fit in a UInt64.
         // We have to go via `UInt` because that's the thing that's the size of a pointer.
         let ptr = UnsafeMutableRawPointer(bitPattern: UInt(truncatingIfNeeded: v))
-        if (ptr == nil) {
+        if ptr == nil {
             throw UniffiInternalError.unexpectedNullPointer
         }
         return try lift(ptr!)
@@ -516,10 +502,9 @@ fileprivate struct FfiConverterTypeFpUrl: FfiConverter {
     }
 }
 
-
 public protocol FPUrlBuilderProtocol {
-    func `build`()  -> FpUrl?
-    
+    func `build`() -> FpUrl?
+
 }
 
 public class FpUrlBuilder: FPUrlBuilderProtocol {
@@ -531,38 +516,34 @@ public class FpUrlBuilder: FPUrlBuilderProtocol {
     required init(unsafeFromRawPointer pointer: UnsafeMutableRawPointer) {
         self.pointer = pointer
     }
-    public convenience init(`remoteUrl`: String)  {
+    public convenience init(`remoteUrl`: String) {
         self.init(unsafeFromRawPointer: try!
-    
-    rustCall() {
-    
-    featureprobe_cab4_FPUrlBuilder_new(
+
+    rustCall {
+
+    featureprobe_1876_FPUrlBuilder_new(
         FfiConverterString.lower(`remoteUrl`), $0)
 })
     }
 
     deinit {
-        try! rustCall { ffi_featureprobe_cab4_FPUrlBuilder_object_free(pointer, $0) }
+        try! rustCall { ffi_featureprobe_1876_FPUrlBuilder_object_free(pointer, $0) }
     }
 
-    
-
-    
-    public func `build`()  -> FpUrl? {
+    public func `build`() -> FpUrl? {
         return try! FfiConverterOptionTypeFpUrl.lift(
             try!
-    rustCall() {
-    
-    featureprobe_cab4_FPUrlBuilder_build(self.pointer, $0
+    rustCall {
+
+    featureprobe_1876_FPUrlBuilder_build(self.pointer, $0
     )
 }
         )
     }
-    
+
 }
 
-
-fileprivate struct FfiConverterTypeFpUrlBuilder: FfiConverter {
+private struct FfiConverterTypeFpUrlBuilder: FfiConverter {
     typealias FfiType = UnsafeMutableRawPointer
     typealias SwiftType = FpUrlBuilder
 
@@ -571,7 +552,7 @@ fileprivate struct FfiConverterTypeFpUrlBuilder: FfiConverter {
         // The Rust code won't compile if a pointer won't fit in a UInt64.
         // We have to go via `UInt` because that's the thing that's the size of a pointer.
         let ptr = UnsafeMutableRawPointer(bitPattern: UInt(truncatingIfNeeded: v))
-        if (ptr == nil) {
+        if ptr == nil {
             throw UniffiInternalError.unexpectedNullPointer
         }
         return try lift(ptr!)
@@ -592,11 +573,10 @@ fileprivate struct FfiConverterTypeFpUrlBuilder: FfiConverter {
     }
 }
 
-
 public protocol FPUserProtocol {
-    func `stableRollout`(`key`: String) 
-    func `with`(`key`: String, `value`: String) 
-    
+    func `stableRollout`(`key`: String)
+    func `with`(`key`: String, `value`: String)
+
 }
 
 public class FpUser: FPUserProtocol {
@@ -608,46 +588,42 @@ public class FpUser: FPUserProtocol {
     required init(unsafeFromRawPointer pointer: UnsafeMutableRawPointer) {
         self.pointer = pointer
     }
-    public convenience init()  {
+    public convenience init() {
         self.init(unsafeFromRawPointer: try!
-    
-    rustCall() {
-    
-    featureprobe_cab4_FPUser_new($0)
+
+    rustCall {
+
+    featureprobe_1876_FPUser_new($0)
 })
     }
 
     deinit {
-        try! rustCall { ffi_featureprobe_cab4_FPUser_object_free(pointer, $0) }
+        try! rustCall { ffi_featureprobe_1876_FPUser_object_free(pointer, $0) }
     }
 
-    
-
-    
-    public func `stableRollout`(`key`: String)  {
+    public func `stableRollout`(`key`: String) {
         try!
-    rustCall() {
-    
-    featureprobe_cab4_FPUser_stable_rollout(self.pointer, 
+    rustCall {
+
+    featureprobe_1876_FPUser_stable_rollout(self.pointer,
         FfiConverterString.lower(`key`), $0
     )
 }
     }
-    public func `with`(`key`: String, `value`: String)  {
+    public func `with`(`key`: String, `value`: String) {
         try!
-    rustCall() {
-    
-    featureprobe_cab4_FPUser_with(self.pointer, 
-        FfiConverterString.lower(`key`), 
+    rustCall {
+
+    featureprobe_1876_FPUser_with(self.pointer,
+        FfiConverterString.lower(`key`),
         FfiConverterString.lower(`value`), $0
     )
 }
     }
-    
+
 }
 
-
-fileprivate struct FfiConverterTypeFpUser: FfiConverter {
+private struct FfiConverterTypeFpUser: FfiConverter {
     typealias FfiType = UnsafeMutableRawPointer
     typealias SwiftType = FpUser
 
@@ -656,7 +632,7 @@ fileprivate struct FfiConverterTypeFpUser: FfiConverter {
         // The Rust code won't compile if a pointer won't fit in a UInt64.
         // We have to go via `UInt` because that's the thing that's the size of a pointer.
         let ptr = UnsafeMutableRawPointer(bitPattern: UInt(truncatingIfNeeded: v))
-        if (ptr == nil) {
+        if ptr == nil {
             throw UniffiInternalError.unexpectedNullPointer
         }
         return try lift(ptr!)
@@ -677,20 +653,18 @@ fileprivate struct FfiConverterTypeFpUser: FfiConverter {
     }
 }
 
-
 public protocol FeatureProbeProtocol {
-    func `close`() 
-    func `boolValue`(`key`: String, `defaultValue`: Bool)  -> Bool
-    func `boolDetail`(`key`: String, `defaultValue`: Bool)  -> FpBoolDetail
-    func `numberValue`(`key`: String, `defaultValue`: Double)  -> Double
-    func `numberDetail`(`key`: String, `defaultValue`: Double)  -> FpNumDetail
-    func `stringValue`(`key`: String, `defaultValue`: String)  -> String
-    func `stringDetail`(`key`: String, `defaultValue`: String)  -> FpStrDetail
-    func `jsonValue`(`key`: String, `defaultValue`: String)  -> String
-    func `jsonDetail`(`key`: String, `defaultValue`: String)  -> FpJsonDetail
-    func `track`(`event`: String) 
-    func `trackValue`(`event`: String, `value`: Double) 
-    
+    func `close`()
+    func `boolValue`(`key`: String, `defaultValue`: Bool) -> Bool
+    func `boolDetail`(`key`: String, `defaultValue`: Bool) -> FpBoolDetail
+    func `numberValue`(`key`: String, `defaultValue`: Double) -> Double
+    func `numberDetail`(`key`: String, `defaultValue`: Double) -> FpNumDetail
+    func `stringValue`(`key`: String, `defaultValue`: String) -> String
+    func `stringDetail`(`key`: String, `defaultValue`: String) -> FpStrDetail
+    func `jsonValue`(`key`: String, `defaultValue`: String) -> String
+    func `jsonDetail`(`key`: String, `defaultValue`: String) -> FpJsonDetail
+    func `track`(`event`: String, `value`: Double?)
+
 }
 
 public class FeatureProbe: FeatureProbeProtocol {
@@ -702,162 +676,149 @@ public class FeatureProbe: FeatureProbeProtocol {
     required init(unsafeFromRawPointer pointer: UnsafeMutableRawPointer) {
         self.pointer = pointer
     }
-    public convenience init(`config`: FpConfig, `user`: FpUser)  {
+    public convenience init(`config`: FpConfig, `user`: FpUser) {
         self.init(unsafeFromRawPointer: try!
-    
-    rustCall() {
-    
-    featureprobe_cab4_FeatureProbe_new(
-        FfiConverterTypeFpConfig.lower(`config`), 
+
+    rustCall {
+
+    featureprobe_1876_FeatureProbe_new(
+        FfiConverterTypeFpConfig.lower(`config`),
         FfiConverterTypeFpUser.lower(`user`), $0)
 })
     }
 
     deinit {
-        try! rustCall { ffi_featureprobe_cab4_FeatureProbe_object_free(pointer, $0) }
+        try! rustCall { ffi_featureprobe_1876_FeatureProbe_object_free(pointer, $0) }
     }
 
-    
-    public static func `newForTest`(`toggles`: String)  -> FeatureProbe {
+    public static func `newForTest`(`toggles`: String) -> FeatureProbe {
         return FeatureProbe(unsafeFromRawPointer: try!
-    
-    rustCall() {
-    
-    featureprobe_cab4_FeatureProbe_new_for_test(
+
+    rustCall {
+
+    featureprobe_1876_FeatureProbe_new_for_test(
         FfiConverterString.lower(`toggles`), $0)
 })
     }
-    
 
-    
-    public func `close`()  {
+    public func `close`() {
         try!
-    rustCall() {
-    
-    featureprobe_cab4_FeatureProbe_close(self.pointer, $0
+    rustCall {
+
+    featureprobe_1876_FeatureProbe_close(self.pointer, $0
     )
 }
     }
-    public func `boolValue`(`key`: String, `defaultValue`: Bool)  -> Bool {
+    public func `boolValue`(`key`: String, `defaultValue`: Bool) -> Bool {
         return try! FfiConverterBool.lift(
             try!
-    rustCall() {
-    
-    featureprobe_cab4_FeatureProbe_bool_value(self.pointer, 
-        FfiConverterString.lower(`key`), 
+    rustCall {
+
+    featureprobe_1876_FeatureProbe_bool_value(self.pointer,
+        FfiConverterString.lower(`key`),
         FfiConverterBool.lower(`defaultValue`), $0
     )
 }
         )
     }
-    public func `boolDetail`(`key`: String, `defaultValue`: Bool)  -> FpBoolDetail {
+    public func `boolDetail`(`key`: String, `defaultValue`: Bool) -> FpBoolDetail {
         return try! FfiConverterTypeFpBoolDetail.lift(
             try!
-    rustCall() {
-    
-    featureprobe_cab4_FeatureProbe_bool_detail(self.pointer, 
-        FfiConverterString.lower(`key`), 
+    rustCall {
+
+    featureprobe_1876_FeatureProbe_bool_detail(self.pointer,
+        FfiConverterString.lower(`key`),
         FfiConverterBool.lower(`defaultValue`), $0
     )
 }
         )
     }
-    public func `numberValue`(`key`: String, `defaultValue`: Double)  -> Double {
+    public func `numberValue`(`key`: String, `defaultValue`: Double) -> Double {
         return try! FfiConverterDouble.lift(
             try!
-    rustCall() {
-    
-    featureprobe_cab4_FeatureProbe_number_value(self.pointer, 
-        FfiConverterString.lower(`key`), 
+    rustCall {
+
+    featureprobe_1876_FeatureProbe_number_value(self.pointer,
+        FfiConverterString.lower(`key`),
         FfiConverterDouble.lower(`defaultValue`), $0
     )
 }
         )
     }
-    public func `numberDetail`(`key`: String, `defaultValue`: Double)  -> FpNumDetail {
+    public func `numberDetail`(`key`: String, `defaultValue`: Double) -> FpNumDetail {
         return try! FfiConverterTypeFpNumDetail.lift(
             try!
-    rustCall() {
-    
-    featureprobe_cab4_FeatureProbe_number_detail(self.pointer, 
-        FfiConverterString.lower(`key`), 
+    rustCall {
+
+    featureprobe_1876_FeatureProbe_number_detail(self.pointer,
+        FfiConverterString.lower(`key`),
         FfiConverterDouble.lower(`defaultValue`), $0
     )
 }
         )
     }
-    public func `stringValue`(`key`: String, `defaultValue`: String)  -> String {
+    public func `stringValue`(`key`: String, `defaultValue`: String) -> String {
         return try! FfiConverterString.lift(
             try!
-    rustCall() {
-    
-    featureprobe_cab4_FeatureProbe_string_value(self.pointer, 
-        FfiConverterString.lower(`key`), 
+    rustCall {
+
+    featureprobe_1876_FeatureProbe_string_value(self.pointer,
+        FfiConverterString.lower(`key`),
         FfiConverterString.lower(`defaultValue`), $0
     )
 }
         )
     }
-    public func `stringDetail`(`key`: String, `defaultValue`: String)  -> FpStrDetail {
+    public func `stringDetail`(`key`: String, `defaultValue`: String) -> FpStrDetail {
         return try! FfiConverterTypeFpStrDetail.lift(
             try!
-    rustCall() {
-    
-    featureprobe_cab4_FeatureProbe_string_detail(self.pointer, 
-        FfiConverterString.lower(`key`), 
+    rustCall {
+
+    featureprobe_1876_FeatureProbe_string_detail(self.pointer,
+        FfiConverterString.lower(`key`),
         FfiConverterString.lower(`defaultValue`), $0
     )
 }
         )
     }
-    public func `jsonValue`(`key`: String, `defaultValue`: String)  -> String {
+    public func `jsonValue`(`key`: String, `defaultValue`: String) -> String {
         return try! FfiConverterString.lift(
             try!
-    rustCall() {
-    
-    featureprobe_cab4_FeatureProbe_json_value(self.pointer, 
-        FfiConverterString.lower(`key`), 
+    rustCall {
+
+    featureprobe_1876_FeatureProbe_json_value(self.pointer,
+        FfiConverterString.lower(`key`),
         FfiConverterString.lower(`defaultValue`), $0
     )
 }
         )
     }
-    public func `jsonDetail`(`key`: String, `defaultValue`: String)  -> FpJsonDetail {
+    public func `jsonDetail`(`key`: String, `defaultValue`: String) -> FpJsonDetail {
         return try! FfiConverterTypeFpJsonDetail.lift(
             try!
-    rustCall() {
-    
-    featureprobe_cab4_FeatureProbe_json_detail(self.pointer, 
-        FfiConverterString.lower(`key`), 
+    rustCall {
+
+    featureprobe_1876_FeatureProbe_json_detail(self.pointer,
+        FfiConverterString.lower(`key`),
         FfiConverterString.lower(`defaultValue`), $0
     )
 }
         )
     }
-    public func `track`(`event`: String)  {
+    public func `track`(`event`: String, `value`: Double? = nil) {
         try!
-    rustCall() {
-    
-    featureprobe_cab4_FeatureProbe_track(self.pointer, 
-        FfiConverterString.lower(`event`), $0
+    rustCall {
+
+    featureprobe_1876_FeatureProbe_track(self.pointer,
+        FfiConverterString.lower(`event`),
+        FfiConverterOptionDouble.lower(`value`), $0
     )
 }
     }
-    public func `trackValue`(`event`: String, `value`: Double)  {
-        try!
-    rustCall() {
-    
-    featureprobe_cab4_FeatureProbe_track_value(self.pointer, 
-        FfiConverterString.lower(`event`), 
-        FfiConverterDouble.lower(`value`), $0
-    )
-}
-    }
-    
+
 }
 
-
-fileprivate struct FfiConverterTypeFeatureProbe: FfiConverter {
+private struct FfiConverterTypeFeatureProbe: FfiConverter {
     typealias FfiType = UnsafeMutableRawPointer
     typealias SwiftType = FeatureProbe
 
@@ -866,7 +827,7 @@ fileprivate struct FfiConverterTypeFeatureProbe: FfiConverter {
         // The Rust code won't compile if a pointer won't fit in a UInt64.
         // We have to go via `UInt` because that's the thing that's the size of a pointer.
         let ptr = UnsafeMutableRawPointer(bitPattern: UInt(truncatingIfNeeded: v))
-        if (ptr == nil) {
+        if ptr == nil {
             throw UniffiInternalError.unexpectedNullPointer
         }
         return try lift(ptr!)
@@ -887,7 +848,6 @@ fileprivate struct FfiConverterTypeFeatureProbe: FfiConverter {
     }
 }
 
-
 public struct FpBoolDetail {
     public var `value`: Bool
     public var `ruleIndex`: UInt16?
@@ -903,7 +863,6 @@ public struct FpBoolDetail {
         self.`reason` = `reason`
     }
 }
-
 
 extension FpBoolDetail: Equatable, Hashable {
     public static func ==(lhs: FpBoolDetail, rhs: FpBoolDetail) -> Bool {
@@ -930,13 +889,12 @@ extension FpBoolDetail: Equatable, Hashable {
     }
 }
 
-
-fileprivate struct FfiConverterTypeFpBoolDetail: FfiConverterRustBuffer {
+private struct FfiConverterTypeFpBoolDetail: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> FpBoolDetail {
         return try FpBoolDetail(
-            `value`: FfiConverterBool.read(from: buf), 
-            `ruleIndex`: FfiConverterOptionUInt16.read(from: buf), 
-            `version`: FfiConverterOptionUInt64.read(from: buf), 
+            `value`: FfiConverterBool.read(from: buf),
+            `ruleIndex`: FfiConverterOptionUInt16.read(from: buf),
+            `version`: FfiConverterOptionUInt64.read(from: buf),
             `reason`: FfiConverterString.read(from: buf)
         )
     }
@@ -948,7 +906,6 @@ fileprivate struct FfiConverterTypeFpBoolDetail: FfiConverterRustBuffer {
         FfiConverterString.write(value.`reason`, into: buf)
     }
 }
-
 
 public struct FpJsonDetail {
     public var `value`: String
@@ -965,7 +922,6 @@ public struct FpJsonDetail {
         self.`reason` = `reason`
     }
 }
-
 
 extension FpJsonDetail: Equatable, Hashable {
     public static func ==(lhs: FpJsonDetail, rhs: FpJsonDetail) -> Bool {
@@ -992,13 +948,12 @@ extension FpJsonDetail: Equatable, Hashable {
     }
 }
 
-
-fileprivate struct FfiConverterTypeFpJsonDetail: FfiConverterRustBuffer {
+private struct FfiConverterTypeFpJsonDetail: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> FpJsonDetail {
         return try FpJsonDetail(
-            `value`: FfiConverterString.read(from: buf), 
-            `ruleIndex`: FfiConverterOptionUInt16.read(from: buf), 
-            `version`: FfiConverterOptionUInt64.read(from: buf), 
+            `value`: FfiConverterString.read(from: buf),
+            `ruleIndex`: FfiConverterOptionUInt16.read(from: buf),
+            `version`: FfiConverterOptionUInt64.read(from: buf),
             `reason`: FfiConverterString.read(from: buf)
         )
     }
@@ -1010,7 +965,6 @@ fileprivate struct FfiConverterTypeFpJsonDetail: FfiConverterRustBuffer {
         FfiConverterString.write(value.`reason`, into: buf)
     }
 }
-
 
 public struct FpNumDetail {
     public var `value`: Double
@@ -1027,7 +981,6 @@ public struct FpNumDetail {
         self.`reason` = `reason`
     }
 }
-
 
 extension FpNumDetail: Equatable, Hashable {
     public static func ==(lhs: FpNumDetail, rhs: FpNumDetail) -> Bool {
@@ -1054,13 +1007,12 @@ extension FpNumDetail: Equatable, Hashable {
     }
 }
 
-
-fileprivate struct FfiConverterTypeFpNumDetail: FfiConverterRustBuffer {
+private struct FfiConverterTypeFpNumDetail: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> FpNumDetail {
         return try FpNumDetail(
-            `value`: FfiConverterDouble.read(from: buf), 
-            `ruleIndex`: FfiConverterOptionUInt16.read(from: buf), 
-            `version`: FfiConverterOptionUInt64.read(from: buf), 
+            `value`: FfiConverterDouble.read(from: buf),
+            `ruleIndex`: FfiConverterOptionUInt16.read(from: buf),
+            `version`: FfiConverterOptionUInt64.read(from: buf),
             `reason`: FfiConverterString.read(from: buf)
         )
     }
@@ -1072,7 +1024,6 @@ fileprivate struct FfiConverterTypeFpNumDetail: FfiConverterRustBuffer {
         FfiConverterString.write(value.`reason`, into: buf)
     }
 }
-
 
 public struct FpStrDetail {
     public var `value`: String
@@ -1089,7 +1040,6 @@ public struct FpStrDetail {
         self.`reason` = `reason`
     }
 }
-
 
 extension FpStrDetail: Equatable, Hashable {
     public static func ==(lhs: FpStrDetail, rhs: FpStrDetail) -> Bool {
@@ -1116,13 +1066,12 @@ extension FpStrDetail: Equatable, Hashable {
     }
 }
 
-
-fileprivate struct FfiConverterTypeFpStrDetail: FfiConverterRustBuffer {
+private struct FfiConverterTypeFpStrDetail: FfiConverterRustBuffer {
     fileprivate static func read(from buf: Reader) throws -> FpStrDetail {
         return try FpStrDetail(
-            `value`: FfiConverterString.read(from: buf), 
-            `ruleIndex`: FfiConverterOptionUInt16.read(from: buf), 
-            `version`: FfiConverterOptionUInt64.read(from: buf), 
+            `value`: FfiConverterString.read(from: buf),
+            `ruleIndex`: FfiConverterOptionUInt16.read(from: buf),
+            `version`: FfiConverterOptionUInt64.read(from: buf),
             `reason`: FfiConverterString.read(from: buf)
         )
     }
@@ -1135,7 +1084,7 @@ fileprivate struct FfiConverterTypeFpStrDetail: FfiConverterRustBuffer {
     }
 }
 
-fileprivate struct FfiConverterOptionUInt16: FfiConverterRustBuffer {
+private struct FfiConverterOptionUInt16: FfiConverterRustBuffer {
     typealias SwiftType = UInt16?
 
     static func write(_ value: SwiftType, into buf: Writer) {
@@ -1156,7 +1105,7 @@ fileprivate struct FfiConverterOptionUInt16: FfiConverterRustBuffer {
     }
 }
 
-fileprivate struct FfiConverterOptionUInt64: FfiConverterRustBuffer {
+private struct FfiConverterOptionUInt64: FfiConverterRustBuffer {
     typealias SwiftType = UInt64?
 
     static func write(_ value: SwiftType, into buf: Writer) {
@@ -1177,7 +1126,28 @@ fileprivate struct FfiConverterOptionUInt64: FfiConverterRustBuffer {
     }
 }
 
-fileprivate struct FfiConverterOptionTypeFpUrl: FfiConverterRustBuffer {
+private struct FfiConverterOptionDouble: FfiConverterRustBuffer {
+    typealias SwiftType = Double?
+
+    static func write(_ value: SwiftType, into buf: Writer) {
+        guard let value = value else {
+            buf.writeInt(Int8(0))
+            return
+        }
+        buf.writeInt(Int8(1))
+        FfiConverterDouble.write(value, into: buf)
+    }
+
+    static func read(from buf: Reader) throws -> SwiftType {
+        switch try buf.readInt() as Int8 {
+        case 0: return nil
+        case 1: return try FfiConverterDouble.read(from: buf)
+        default: throw UniffiInternalError.unexpectedOptionalTag
+        }
+    }
+}
+
+private struct FfiConverterOptionTypeFpUrl: FfiConverterRustBuffer {
     typealias SwiftType = FpUrl?
 
     static func write(_ value: SwiftType, into buf: Writer) {

@@ -46,115 +46,111 @@ typedef struct RustCallStatus {
 // ⚠️ increment the version suffix in all instances of UNIFFI_SHARED_HEADER_V4 in this file.           ⚠️
 #endif // def UNIFFI_SHARED_H
 
-void ffi_featureprobe_cab4_FeatureProbe_object_free(
+void ffi_featureprobe_1876_FeatureProbe_object_free(
       void*_Nonnull ptr,
     RustCallStatus *_Nonnull out_status
     );
-void*_Nonnull featureprobe_cab4_FeatureProbe_new(
+void*_Nonnull featureprobe_1876_FeatureProbe_new(
       void*_Nonnull config,void*_Nonnull user,
     RustCallStatus *_Nonnull out_status
     );
-void*_Nonnull featureprobe_cab4_FeatureProbe_new_for_test(
+void*_Nonnull featureprobe_1876_FeatureProbe_new_for_test(
       RustBuffer toggles,
     RustCallStatus *_Nonnull out_status
     );
-void featureprobe_cab4_FeatureProbe_close(
+void featureprobe_1876_FeatureProbe_close(
       void*_Nonnull ptr,
     RustCallStatus *_Nonnull out_status
     );
-int8_t featureprobe_cab4_FeatureProbe_bool_value(
+int8_t featureprobe_1876_FeatureProbe_bool_value(
       void*_Nonnull ptr,RustBuffer key,int8_t default_value,
     RustCallStatus *_Nonnull out_status
     );
-RustBuffer featureprobe_cab4_FeatureProbe_bool_detail(
+RustBuffer featureprobe_1876_FeatureProbe_bool_detail(
       void*_Nonnull ptr,RustBuffer key,int8_t default_value,
     RustCallStatus *_Nonnull out_status
     );
-double featureprobe_cab4_FeatureProbe_number_value(
+double featureprobe_1876_FeatureProbe_number_value(
       void*_Nonnull ptr,RustBuffer key,double default_value,
     RustCallStatus *_Nonnull out_status
     );
-RustBuffer featureprobe_cab4_FeatureProbe_number_detail(
+RustBuffer featureprobe_1876_FeatureProbe_number_detail(
       void*_Nonnull ptr,RustBuffer key,double default_value,
     RustCallStatus *_Nonnull out_status
     );
-RustBuffer featureprobe_cab4_FeatureProbe_string_value(
+RustBuffer featureprobe_1876_FeatureProbe_string_value(
       void*_Nonnull ptr,RustBuffer key,RustBuffer default_value,
     RustCallStatus *_Nonnull out_status
     );
-RustBuffer featureprobe_cab4_FeatureProbe_string_detail(
+RustBuffer featureprobe_1876_FeatureProbe_string_detail(
       void*_Nonnull ptr,RustBuffer key,RustBuffer default_value,
     RustCallStatus *_Nonnull out_status
     );
-RustBuffer featureprobe_cab4_FeatureProbe_json_value(
+RustBuffer featureprobe_1876_FeatureProbe_json_value(
       void*_Nonnull ptr,RustBuffer key,RustBuffer default_value,
     RustCallStatus *_Nonnull out_status
     );
-RustBuffer featureprobe_cab4_FeatureProbe_json_detail(
+RustBuffer featureprobe_1876_FeatureProbe_json_detail(
       void*_Nonnull ptr,RustBuffer key,RustBuffer default_value,
     RustCallStatus *_Nonnull out_status
     );
-void featureprobe_cab4_FeatureProbe_track(
-      void*_Nonnull ptr,RustBuffer event,
+void featureprobe_1876_FeatureProbe_track(
+      void*_Nonnull ptr,RustBuffer event,RustBuffer value,
     RustCallStatus *_Nonnull out_status
     );
-void featureprobe_cab4_FeatureProbe_track_value(
-      void*_Nonnull ptr,RustBuffer event,double value,
-    RustCallStatus *_Nonnull out_status
-    );
-void ffi_featureprobe_cab4_FPUser_object_free(
+void ffi_featureprobe_1876_FPUser_object_free(
       void*_Nonnull ptr,
     RustCallStatus *_Nonnull out_status
     );
-void*_Nonnull featureprobe_cab4_FPUser_new(
+void*_Nonnull featureprobe_1876_FPUser_new(
       
     RustCallStatus *_Nonnull out_status
     );
-void featureprobe_cab4_FPUser_stable_rollout(
+void featureprobe_1876_FPUser_stable_rollout(
       void*_Nonnull ptr,RustBuffer key,
     RustCallStatus *_Nonnull out_status
     );
-void featureprobe_cab4_FPUser_with(
+void featureprobe_1876_FPUser_with(
       void*_Nonnull ptr,RustBuffer key,RustBuffer value,
     RustCallStatus *_Nonnull out_status
     );
-void ffi_featureprobe_cab4_FPUrl_object_free(
+void ffi_featureprobe_1876_FPUrl_object_free(
       void*_Nonnull ptr,
     RustCallStatus *_Nonnull out_status
     );
-void ffi_featureprobe_cab4_FPUrlBuilder_object_free(
+void ffi_featureprobe_1876_FPUrlBuilder_object_free(
       void*_Nonnull ptr,
     RustCallStatus *_Nonnull out_status
     );
-void*_Nonnull featureprobe_cab4_FPUrlBuilder_new(
+void*_Nonnull featureprobe_1876_FPUrlBuilder_new(
       RustBuffer remote_url,
     RustCallStatus *_Nonnull out_status
     );
-RustBuffer featureprobe_cab4_FPUrlBuilder_build(
+RustBuffer featureprobe_1876_FPUrlBuilder_build(
       void*_Nonnull ptr,
     RustCallStatus *_Nonnull out_status
     );
-void ffi_featureprobe_cab4_FPConfig_object_free(
+void ffi_featureprobe_1876_FPConfig_object_free(
       void*_Nonnull ptr,
     RustCallStatus *_Nonnull out_status
     );
-void*_Nonnull featureprobe_cab4_FPConfig_new(
+void*_Nonnull featureprobe_1876_FPConfig_new(
       void*_Nonnull remote_url,RustBuffer client_sdk_key,uint32_t refresh_interval,uint32_t start_wait,
     RustCallStatus *_Nonnull out_status
     );
-RustBuffer ffi_featureprobe_cab4_rustbuffer_alloc(
+RustBuffer ffi_featureprobe_1876_rustbuffer_alloc(
       int32_t size,
     RustCallStatus *_Nonnull out_status
     );
-RustBuffer ffi_featureprobe_cab4_rustbuffer_from_bytes(
+RustBuffer ffi_featureprobe_1876_rustbuffer_from_bytes(
       ForeignBytes bytes,
     RustCallStatus *_Nonnull out_status
     );
-void ffi_featureprobe_cab4_rustbuffer_free(
+void ffi_featureprobe_1876_rustbuffer_free(
       RustBuffer buf,
     RustCallStatus *_Nonnull out_status
     );
-RustBuffer ffi_featureprobe_cab4_rustbuffer_reserve(
+RustBuffer ffi_featureprobe_1876_rustbuffer_reserve(
       RustBuffer buf,int32_t additional,
     RustCallStatus *_Nonnull out_status
     );
